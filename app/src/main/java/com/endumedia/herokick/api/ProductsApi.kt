@@ -13,5 +13,5 @@ import retrofit2.http.Query
 interface ProductsApi {
 
     @GET("/items")
-    fun getItems(@Query("page") page: String): Call<List<Product>>
+    fun getItems(@Query("page") page: Int): Call<List<Product>>
 }
