@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ import kotlinx.android.synthetic.main.product_item.view.*
 /**
  * Created by Nino on 02.10.19
  */
-class ProductsAdapter(context: Context, private val retryCallback: () -> Unit)
+class ProductsAdapter(private val retryCallback: () -> Unit)
 : PagedListAdapter<Product, RecyclerView.ViewHolder>(Product_COMPARATOR) {
 
     private var networkState: NetworkState? = null
@@ -38,6 +39,38 @@ class ProductsAdapter(context: Context, private val retryCallback: () -> Unit)
         }
     }
 
+    override fun submitList(pagedList: PagedList<Product>?) {
+        super.submitList(pagedList)
+    }
+
+    private var latestList: PagedList<Product>? = null
+
+    override fun onCurrentListChanged(
+        previousList: PagedList<Product>?,
+        currentList: PagedList<Product>?) {
+        super.onCurrentListChanged(previousList, currentList)
+        latestList = currentList
+    }
+
+//    private val nameComparator = Comparator<Product> { o1, o2 ->
+//        o2?.name?.first()?.let { o1?.name?.first()?.compareTo(it) } ?: 0 }
+//
+//    fun sortBy(idx: Int) {
+//        sortType = SortType.values()[idx]
+//        when (sortType) {
+//            SortType.LATEST -> {}
+//            SortType.NAME -> {
+////                latestList?.sortWith(nameComparator)
+//                val newList = PagedList(latestList?.dataSource.mapByPage { it.sortWith(nameComparator) },
+//                    latestList?.)
+//                latestList?.set(0, latestList?.get(2))
+//
+//                latestList?.dataSource?.mapByPage { it.sortWith(nameComparator) }.
+//
+//                    submitList(latestList)
+//            }
+//        }
+//    }
 
     private fun hasExtraRow() = networkState != null && networkState != NetworkState.LOADED
 
@@ -68,7 +101,6 @@ class ProductsAdapter(context: Context, private val retryCallback: () -> Unit)
             notifyItemChanged(itemCount - 1)
         }
     }
-
 
     inner class NoteViewHolder(view: View)
         : RecyclerView.ViewHolder(view) {

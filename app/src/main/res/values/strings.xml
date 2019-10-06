@@ -4,4 +4,14 @@
     <string name="nameLabel">Name:</string>
     <string name="brandLabel">Brand:</string>
     <string name="sizeLabel">Size:</string>
+    <string name="product_sort">Sort</string>
+    <string name="latest">Latest</string>
+    <string name="byName">By name</string>
+    <string name="product_listing_filter">Filter</string>
+
+
+    <string-array name="sort_spinner_values">
+        <item>@string/latest</item>
+        <item>@string/byName</item>
+    </string-array>
 </resources>

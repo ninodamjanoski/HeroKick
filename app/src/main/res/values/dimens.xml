@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="medium_margin">16dp</dimen>
+    <dimen name="tool_bar_height">56dp</dimen>
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="screen_padding_half">8dp</dimen>
 </resources>

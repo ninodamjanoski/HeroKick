@@ -32,10 +32,14 @@ class ProductsBoundaryCallback(private val webservice: ProductsApi,
      */
     @MainThread
     override fun onZeroItemsLoaded() {
-        helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL) {
-            webservice.getItems(sharedPrefs
-                .getInt(ProductsRepositoryImpl.NEXT_PAGE, 1))
-                .enqueue(createWebserviceCallback(it))
+        val firstPage = sharedPrefs
+            .getInt(ProductsRepositoryImpl.NEXT_PAGE,
+                ProductsRepositoryImpl.FIRST_PAGE)
+        if (firstPage == ProductsRepositoryImpl.FIRST_PAGE) {
+            helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL) {
+                webservice.getItems(firstPage)
+                    .enqueue(createWebserviceCallback(it))
+            }
         }
     }
 

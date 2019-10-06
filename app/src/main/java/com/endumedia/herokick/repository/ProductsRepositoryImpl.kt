@@ -26,19 +26,38 @@ constructor(private val productsDao: ProductsDao,
             private val productsApi: ProductsApi,
             private val ioExecutor: Executor): ProductsRepository {
 
+    private var refreshState = MutableLiveData<NetworkState>()
+
     /**
      * By refresh items, we want to empty items table and fetch as from the beginning
      * when the db is empty
      */
     private fun refreshItems() {
-        // Deleting the items triggers on onZeroItemsLoaded in BoundaryCallback
-        // which then calls the endpoint to fetch the first page
-        ioExecutor.execute {
-            productsDao.deleteItems()
-        }
-    }
 
-    override fun getItems(): Listing<Product> {
+        refreshState.value = NetworkState.LOADING
+        productsApi.getItems(1).enqueue(object : Callback<List<Product>> {
+            override fun onFailure(call: Call<List<Product>>, t: Throwable) {
+                // retrofit calls this on main thread so safe to call set value
+                    refreshState.value = NetworkState.error(t.message)
+            }
+
+            override fun onResponse(
+                call: Call<List<Product>>,
+                response: Response<List<Product>>
+            ) {
+                ioExecutor.execute {
+                    sharedPrefs.edit()
+                        .clear()
+                    productsDao.deleteItems()
+                    insertItemsInDb(response)
+                    // since we are in bg thread now, post the result.
+                    refreshState.postValue(NetworkState.LOADED)
+                }
+            }
+        })
+     }
+
+    override fun getItems(sortType: SortType): Listing<Product> {
 
         // create a boundary callback which will observe when the user reaches to the edges of
         // the list and update the database with extra data.
@@ -46,19 +65,19 @@ constructor(private val productsDao: ProductsDao,
             webservice = productsApi,
             sharedPrefs = sharedPrefs,
             handleResponse = {insertItemsInDb(it)},
-            ioExecutor = ioExecutor
-        )
+            ioExecutor = ioExecutor)
 
         return Listing(
-            pagedList = productsDao.getItems()
+            pagedList = productsDao.getItems(sortType)
                 .toLiveData(10, boundaryCallback = boundaryCallback),
             networkState = boundaryCallback.networkState,
+            refreshState = refreshState,
             retry = { boundaryCallback.helper.retryAllFailed() },
             refresh = { refreshItems() })
     }
 
     private fun insertItemsInDb(response: Response<List<Product>>) {
-
+        if (response.body()?.isEmpty() ?: true) return
         val nextPage = getNextPage(response.headers())
         sharedPrefs.edit()
             .putInt(NEXT_PAGE, nextPage ?: -1)
@@ -109,6 +128,7 @@ constructor(private val productsDao: ProductsDao,
             return links
         }
 
+        const val FIRST_PAGE = 1
         const val NEXT_PAGE = "nextPage"
     }
 }

@@ -1,7 +1,10 @@
 package com.endumedia.herokick.ui
 
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.endumedia.herokick.repository.ProductsRepository
+import com.endumedia.herokick.repository.SortType
 import javax.inject.Inject
 
 
@@ -11,17 +14,32 @@ import javax.inject.Inject
 class ProductsViewModel @Inject
 constructor(repository: ProductsRepository) : ViewModel() {
 
-    private val listing = repository.getItems()
+    private val sortType = MutableLiveData<SortType>().apply {
+        value = SortType.LATEST
+    }
 
-    val products = listing.pagedList
+    private val listing = Transformations.map(sortType) { sorting ->
+        repository.getItems(sorting)
+    }
 
-    val networkState = listing.networkState
+    val products = Transformations.switchMap(listing) { it.pagedList }
+
+    val networkState = Transformations.switchMap(listing) { it.networkState }
+
+    val refreshState = Transformations.switchMap(listing) { it.refreshState }
 
     fun refresh() {
-        listing.refresh.invoke()
+        listing.value?.refresh?.invoke()
     }
 
     fun retry() {
-        listing.retry.invoke()
+        listing.value?.retry?.invoke()
+    }
+
+    fun setSorting(idxSorting: Int) {
+        val sorting = SortType.values()[idxSorting]
+        if (sortType.value != sorting) {
+            sortType.value = sorting
+        }
     }
 }

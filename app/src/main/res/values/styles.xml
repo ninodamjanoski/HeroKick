@@ -78,7 +78,7 @@
     <style name="ProximaFontSemibold.Size14" parent="@style/ProximaFontSemibold">
         <item name="android:textSize">@dimen/text_14</item>
     </style>
-        <style name="ProuctAppTheme" parent="@style/AppTheme.Base" />
+        <style name="HeroKickAppTheme" parent="@style/AppTheme.Base" />
 
         <style name="AppTheme.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
             <item name="windowActionModeOverlay">true</item>

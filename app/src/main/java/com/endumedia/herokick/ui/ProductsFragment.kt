@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +15,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.endumedia.herokick.R
 import com.endumedia.herokick.di.Injectable
 import com.endumedia.herokick.repository.NetworkState
+import com.endumedia.herokick.ui.widgets.HintAdapter
+import com.endumedia.herokick.ui.widgets.HintSpinner
 import javax.inject.Inject
 
 
@@ -24,8 +27,9 @@ class ProductsFragment : Fragment(), Injectable {
 
     private val list by lazy { view?.findViewById<RecyclerView>(R.id.list) }
     private val swipeRefresh by lazy { view?.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh) }
+    private val spSort by lazy { view?.findViewById<Spinner>(R.id.spinner_sort) }
 
-    private lateinit var adapter: ProductsAdapter
+    private lateinit var productsAdapter: ProductsAdapter
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -43,23 +47,38 @@ class ProductsFragment : Fragment(), Injectable {
         super.onViewCreated(view, savedInstanceState)
 
         model.products.observe(this, Observer { items ->
-            adapter.submitList(items)
+            productsAdapter.submitList(items)
         })
 
-        model.networkState.observe(this, Observer { state ->
-            adapter.setNetworkState(state)
-            if (state != NetworkState.LOADING && swipeRefresh?.isRefreshing ?: false) {
-                swipeRefresh?.isRefreshing = false
-            }
-        })
+        model.networkState.observe(this, networkStateObserver)
+        model.refreshState.observe(this, networkStateObserver)
 
-        adapter = ProductsAdapter (context!!) { model.retry() }
+        spSort?.run {
+            val stringArray = resources.getStringArray(R.array.sort_spinner_values)
+            val hintAdapter = HintAdapter(context, R.layout.product_list_view_row,
+                R.string.product_sort, stringArray.asList(), false)
+            HintSpinner(this, hintAdapter,
+                HintSpinner.Callback<String> { i, t ->
+                    hintAdapter.setSelectedTopPosition(i)
+                    model.setSorting(i)
+                }).init()
+        }
+
+        productsAdapter = ProductsAdapter { model.retry() }
         list?.addItemDecoration(
             DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-        list?.adapter = adapter
+        list?.adapter = productsAdapter
 
         swipeRefresh?.setOnRefreshListener {
             model.refresh()
         }
     }
+
+    private val networkStateObserver = Observer<NetworkState> { state ->
+            productsAdapter.setNetworkState(state)
+            if (state != NetworkState.LOADING && swipeRefresh?.isRefreshing ?: false) {
+                swipeRefresh?.isRefreshing = false
+            }
+        }
+
 }
