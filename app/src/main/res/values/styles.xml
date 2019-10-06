@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -8,4 +8,96 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+        <style name="CmsProductListNameText" parent="@style/ProximaFontRegular.Size14">
+            <item name="android:textColor">@color/cmsProductListNameTextColour</item>
+        </style>
+
+        <style name="ProximaFontRegular.Size14" parent="@style/ProximaFontRegular">
+            <item name="android:textSize">@dimen/text_14</item>
+        </style>
+
+        <style name="ProximaFontRegular">
+            <item name="android:textColor">@color/black</item>
+            <item name="android:textAppearance">@font/mark_simonson_proxima_nova_regular</item>
+        </style>
+
+        <style name="CmsProductListColourText" parent="@style/ProximaFontRegular.Size14">
+            <item name="android:textColor">@color/cmsProductListColourTextColour</item>
+        </style>
+
+        <style name="CmsProductListPriceText" parent="@style/ProximaFontRegular.Size14">
+            <item name="android:textColor">@color/cmsProductListPriceTextColour</item>
+        </style>
+
+        <style name="ProductListHeaderCountText" parent="@style/ProximaFontRegular.Size14">
+            <item name="android:textColor">@color/productListHeaderTextColour</item>
+        </style>
+
+
+    <style name="ProductListSizeText" parent="@style/ProximaFontRegular.Size14">
+        <item name="android:textColor">@color/cmsProductListColourTextColour</item>
+    </style>
+
+        <style name="ToolbarTitle" parent="@style/ProximaFontSemibold.Size18.Tracker100">
+            <item name="android:textColor">@color/categoryListTitleTextColour</item>
+            <item name="android:textAllCaps">true</item>
+        </style>
+
+        <style name="ProximaFontSemibold.Size18.Tracker100" parent="@style/ProximaFontSemibold.Size18">
+            <item name="android:letterSpacing" tools:targetApi="lollipop">0.1</item>
+        </style>
+
+        <style name="ProximaFontSemibold.Size18" parent="@style/ProximaFontSemibold">
+            <item name="android:textSize">@dimen/text_18</item>
+        </style>
+
+        <style name="ProximaFontSemibold">
+            <item name="android:textColor">@color/black</item>
+            <item name="android:textAppearance">@font/mark_simonson_proxima_nova_alt_semibold</item>
+        </style>
+
+        <style name="FilterClearButton" parent="@style/ProximaFontRegular.Size12">
+            <item name="android:textColor">@color/searchClearButtonColour</item>
+            <item name="android:textAllCaps">false</item>
+            <item name="backgroundTint">@color/white</item>
+        </style>
+
+        <style name="ProximaFontRegular.Size12" parent="@style/ProximaFontRegular">
+            <item name="android:textSize">@dimen/text_12</item>
+        </style>
+
+        <style name="ProximaFontSemibold.Size16.Tracker100" parent="@style/ProximaFontSemibold.Size16">
+            <item name="android:textSize">@dimen/text_16</item>
+            <item name="android:letterSpacing" tools:targetApi="lollipop">0.1</item>
+        </style>
+
+        <style name="ProximaFontSemibold.Size16" parent="@style/ProximaFontSemibold">
+            <item name="android:textSize">@dimen/text_16</item>
+        </style>
+
+    <style name="ProximaFontSemibold.Size14" parent="@style/ProximaFontSemibold">
+        <item name="android:textSize">@dimen/text_14</item>
+    </style>
+        <style name="ProuctAppTheme" parent="@style/AppTheme.Base" />
+
+        <style name="AppTheme.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
+            <item name="windowActionModeOverlay">true</item>
+        </style>
+        <style name="ProductListPriceText" parent="@style/ProximaFontRegular.Size14.Tracker25">
+            <item name="android:textColor">@color/productListPriceTextColour</item>
+        </style>
+        <style name="ProximaFontRegular.Size14.Tracker25" parent="@style/ProximaFontRegular.Size14">
+            <item name="android:letterSpacing" tools:targetApi="lollipop">0.025</item>
+        </style>
+        <style name="ProductListColourText" parent="@style/ProximaFontRegular.Size14.Tracker25">
+            <item name="android:textColor">@color/productListColourTextColour</item>
+        </style>
+        <style name="ProductListNameText" parent="@style/ProximaFontRegular.Size14.Tracker25">
+            <item name="android:textColor">@color/productListNameTextColour</item>
+        </style>
+
+    <dimen name="text_16">16sp</dimen>
+    <dimen name="text_12">12sp</dimen>
+    <dimen name="text_18">18sp</dimen>
+    <dimen name="text_14">14sp</dimen>
 </resources>

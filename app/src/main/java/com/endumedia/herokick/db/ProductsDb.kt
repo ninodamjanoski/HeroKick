@@ -11,8 +11,8 @@ import com.endumedia.herokick.vo.Product
  * Created by Nino on 01.10.19
  */
 @Database(
-    entities = arrayOf(Product::class),
-    version = 1,
+    entities = [Product::class],
+    version = 6,
     exportSchema = false)
 abstract class ProductsDb : RoomDatabase() {
 

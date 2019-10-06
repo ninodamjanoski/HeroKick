@@ -41,7 +41,7 @@ class ProductsRepositoryImplTest {
     @Before
     fun init() {
         Mockito.`when`(db.productsDao()).thenReturn(dao)
-//        Mockito.doReturn(getProductsDataSourceFromDb()).`when`(dao).getNotes()
+//        Mockito.doReturn(getProductsDataSourceFromDb()).`when`(dao).getProducts()
 //        Mockito.`when`(dao.deleteNotes()).then {
 //            notesFactory.list.clear()
 //        }

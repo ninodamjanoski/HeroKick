@@ -1,4 +1,4 @@
-package com.endumedia.notes.util
+package com.endumedia.herokick.util
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

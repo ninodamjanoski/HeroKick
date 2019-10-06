@@ -60,7 +60,6 @@ dependencies {
     implementation deps.navigation.fragment_ktx
     implementation deps.room.runtime
     implementation deps.lifecycle.runtime
-    implementation deps.paging_ktx
     implementation deps.kotlin.stdlib
     implementation deps.retrofit.runtime
     implementation deps.retrofit.gson
@@ -92,4 +91,8 @@ dependencies {
     testImplementation deps.mockito.core
     testImplementation deps.mockito.inline
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.paging:paging-common-ktx:2.1.0'
+    implementation 'androidx.paging:paging-common:2.1.0'
+    implementation 'androidx.paging:paging-runtime-ktx:2.1.0'
+    implementation 'androidx.paging:paging-runtime:2.1.0'
 }

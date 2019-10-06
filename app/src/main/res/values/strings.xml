@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">HeroKick</string>
+    <string name="retry">Retry</string>
+    <string name="nameLabel">Name:</string>
+    <string name="brandLabel">Brand:</string>
+    <string name="sizeLabel">Size:</string>
 </resources>

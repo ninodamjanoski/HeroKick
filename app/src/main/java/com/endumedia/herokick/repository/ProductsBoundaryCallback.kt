@@ -1,11 +1,12 @@
 package com.endumedia.herokick.repository
 
+import android.content.SharedPreferences
 import androidx.annotation.MainThread
 import androidx.paging.PagedList
 import androidx.paging.PagingRequestHelper
 import com.endumedia.herokick.api.ProductsApi
 import com.endumedia.herokick.vo.Product
-import com.endumedia.notes.util.createStatusLiveData
+import com.endumedia.herokick.util.createStatusLiveData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,7 +17,8 @@ import java.util.concurrent.Executor
  * Created by Nino on 02.10.19
  */
 class ProductsBoundaryCallback(private val webservice: ProductsApi,
-                               private val handleResponse: (List<Product>?) -> Unit,
+                               private val sharedPrefs: SharedPreferences,
+                               private val handleResponse: (Response<List<Product>>) -> Unit,
                                private val ioExecutor: Executor,
                                private val networkPageSize: Int = 10)
     : PagedList.BoundaryCallback<Product>()  {
@@ -31,23 +33,28 @@ class ProductsBoundaryCallback(private val webservice: ProductsApi,
     @MainThread
     override fun onZeroItemsLoaded() {
         helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL) {
-            webservice.getItems(1)
+            webservice.getItems(sharedPrefs
+                .getInt(ProductsRepositoryImpl.NEXT_PAGE, 1))
                 .enqueue(createWebserviceCallback(it))
         }
     }
 
 
-
     /**
      * User reached to the end of the list.
-     * TODO to be implemented when theres paging supported by the backend service
      */
     @MainThread
     override fun onItemAtEndLoaded(itemAtEnd: Product) {
         super.onItemAtEndLoaded(itemAtEnd)
-        helper.runIfNotRunning(PagingRequestHelper.RequestType.AFTER) {
-            webservice.getItems(1)
-                .enqueue(createWebserviceCallback(it))
+        val nextPage = sharedPrefs
+            .getInt(ProductsRepositoryImpl.NEXT_PAGE, 1)
+        // When nextPage is -1, is when theres no more pages to fetch from the endpoint
+        // so, we dont want to call the endpoint in that case
+        if (nextPage > -1) {
+            helper.runIfNotRunning(PagingRequestHelper.RequestType.AFTER) {
+                webservice.getItems(nextPage)
+                    .enqueue(createWebserviceCallback(it))
+            }
         }
     }
 
@@ -55,14 +62,11 @@ class ProductsBoundaryCallback(private val webservice: ProductsApi,
             : Callback<List<Product>> {
 
         return object : Callback<List<Product>> {
-            override fun onFailure(
-                call: Call<List<Product>>,
-                t: Throwable) {
+            override fun onFailure(call: Call<List<Product>>, t: Throwable) {
                 it.recordFailure(t)
             }
 
-            override fun onResponse(
-                call: Call<List<Product>>,
+            override fun onResponse(call: Call<List<Product>>,
                 response: Response<List<Product>>) {
                 insertItemsIntoDb(response, it)
             }
@@ -76,7 +80,7 @@ class ProductsBoundaryCallback(private val webservice: ProductsApi,
     private fun insertItemsIntoDb(response: Response<List<Product>>,
                                   it: PagingRequestHelper.Request.Callback) {
         ioExecutor.execute {
-            handleResponse(response.body())
+            handleResponse(response)
             it.recordSuccess()
         }
     }
