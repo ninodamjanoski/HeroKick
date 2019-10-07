@@ -78,6 +78,13 @@ class ProductsRepositoryImplTest {
         MatcherAssert.assertThat(pagedList.size, CoreMatchers.`is`(0))
     }
 
+    /**
+     * asserts that empty list works fine
+     */
+    @Test
+    fun fetchEmptyListFromNetwork() {
+        fetchFromNetwork()
+    }
 
     /**
      * asserts loading a page
@@ -94,10 +101,10 @@ class ProductsRepositoryImplTest {
     }
 
     /**
-     * asserts that a list w/ single item is loaded properly
+     * asserts that a list w/ single item is loaded properly from db
      */
     @Test
-    fun oneItem() {
+    fun oneItemFromDb() {
         val product = itemsFactory.createProduct()
         fakeApi.addProduct(product)
         val listing = repository.getItems(sortType)
@@ -111,6 +118,11 @@ class ProductsRepositoryImplTest {
     fun oneItemOnEmptyDb() {
         val product = itemsFactory.createProduct()
         fakeApi.addProduct(product)
+
+        fetchFromNetwork()
+    }
+
+    private fun fetchFromNetwork() {
         // Setting this to true, will force the boundary callback to call the
         // network endpoint
         isDbEmpty = true
@@ -167,7 +179,7 @@ class ProductsRepositoryImplTest {
     }
 
     private fun failedToLoadFromNetwork() {
-        fakeApi.failureMsg = "xxx"
+        fakeApi.failureMsg = FAILED_TO_CONNECT_MESSAGE
         isDbEmpty = true
         val items = repository.getItems(sortType)
         // trigger load
@@ -187,7 +199,7 @@ class ProductsRepositoryImplTest {
     @Test
     fun retrySuccessAfterInitialLoadFailed() {
 
-        fakeApi.failureMsg = "xxx"
+        fakeApi.failureMsg = FAILED_TO_CONNECT_MESSAGE
         isDbEmpty = true
 
         val listing = repository.getItems(sortType)
