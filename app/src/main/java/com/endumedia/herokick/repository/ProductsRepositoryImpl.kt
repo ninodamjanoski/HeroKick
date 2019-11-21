@@ -82,6 +82,7 @@ constructor(private val productsDao: ProductsDao,
         // the list and update the database with extra data.
         val boundaryCallback = ProductsBoundaryCallback(
             webservice = productsApi,
+            isSearching = !TextUtils.isEmpty(query),
             sharedPrefs = sharedPrefs,
             handleResponse = {insertItemsInDb(it)},
             ioExecutor = ioExecutor)

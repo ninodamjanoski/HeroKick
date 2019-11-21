@@ -17,6 +17,7 @@ import java.util.concurrent.Executor
  * Created by Nino on 02.10.19
  */
 class ProductsBoundaryCallback(private val webservice: ProductsApi,
+                               private val isSearching: Boolean,
                                private val sharedPrefs: SharedPreferences,
                                private val handleResponse: (Response<List<Product>>) -> Unit,
                                private val ioExecutor: Executor,
@@ -35,7 +36,9 @@ class ProductsBoundaryCallback(private val webservice: ProductsApi,
         val firstPage = sharedPrefs
             .getInt(ProductsRepositoryImpl.NEXT_PAGE,
                 ProductsRepositoryImpl.FIRST_PAGE)
-        if (firstPage == ProductsRepositoryImpl.FIRST_PAGE) {
+        // When is searching, we have to avoid calling this method if zero items found,
+        // Because is misleading
+        if (firstPage == ProductsRepositoryImpl.FIRST_PAGE && !isSearching) {
             helper.runIfNotRunning(PagingRequestHelper.RequestType.INITIAL) {
                 webservice.getItems(firstPage)
                     .enqueue(createWebserviceCallback(it))
