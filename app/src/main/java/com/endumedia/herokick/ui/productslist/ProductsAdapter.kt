@@ -1,6 +1,5 @@
-package com.endumedia.herokick.ui
+package com.endumedia.herokick.ui.productslist
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.endumedia.herokick.R
 import com.endumedia.herokick.repository.NetworkState
+import com.endumedia.herokick.ui.ItemCLickListener
 import com.endumedia.herokick.vo.Product
 import kotlinx.android.synthetic.main.product_item.view.*
 
@@ -17,7 +17,8 @@ import kotlinx.android.synthetic.main.product_item.view.*
 /**
  * Created by Nino on 02.10.19
  */
-class ProductsAdapter(private val retryCallback: () -> Unit)
+class ProductsAdapter(private val clickListener: ItemCLickListener,
+                      private val retryCallback: () -> Unit)
 : PagedListAdapter<Product, RecyclerView.ViewHolder>(Product_COMPARATOR) {
 
     private var networkState: NetworkState? = null
@@ -26,7 +27,10 @@ class ProductsAdapter(private val retryCallback: () -> Unit)
         return when (viewType) {
             R.layout.product_item -> NoteViewHolder(LayoutInflater.from(parent.context)
                     .inflate(R.layout.product_item, parent, false))
-            R.layout.network_state_item -> NetworkStateItemViewHolder.create(parent, retryCallback)
+            R.layout.network_state_item -> NetworkStateItemViewHolder.create(
+                parent,
+                retryCallback
+            )
             else -> throw IllegalArgumentException("unknown view type $viewType")
         }
     }
@@ -52,26 +56,6 @@ class ProductsAdapter(private val retryCallback: () -> Unit)
         latestList = currentList
     }
 
-//    private val nameComparator = Comparator<Product> { o1, o2 ->
-//        o2?.name?.first()?.let { o1?.name?.first()?.compareTo(it) } ?: 0 }
-//
-//    fun sortBy(idx: Int) {
-//        sortType = SortType.values()[idx]
-//        when (sortType) {
-//            SortType.LATEST -> {}
-//            SortType.NAME -> {
-////                latestList?.sortWith(nameComparator)
-//                val newList = PagedList(latestList?.dataSource.mapByPage { it.sortWith(nameComparator) },
-//                    latestList?.)
-//                latestList?.set(0, latestList?.get(2))
-//
-//                latestList?.dataSource?.mapByPage { it.sortWith(nameComparator) }.
-//
-//                    submitList(latestList)
-//            }
-//        }
-//    }
-
     private fun hasExtraRow() = networkState != null && networkState != NetworkState.LOADED
 
     override fun getItemViewType(position: Int): Int {
@@ -86,7 +70,7 @@ class ProductsAdapter(private val retryCallback: () -> Unit)
         return super.getItemCount() + if (hasExtraRow()) 1 else 0
     }
 
-    fun setNetworkState(newNetworkState: NetworkState?) {
+    @Synchronized fun setNetworkState(newNetworkState: NetworkState?) {
         val previousState = this.networkState
         val hadExtraRow = hasExtraRow()
         this.networkState = newNetworkState
@@ -107,6 +91,10 @@ class ProductsAdapter(private val retryCallback: () -> Unit)
 
         fun bind(item: Product?) {
             if (item == null) return
+
+            itemView.setOnClickListener {
+                clickListener.onCLicked(item) }
+
             item.name?.let {
                 itemView.tvName.text = it
             }
@@ -120,7 +108,6 @@ class ProductsAdapter(private val retryCallback: () -> Unit)
     }
 
     companion object {
-        private val PAYLOAD_SCORE = Any()
         val Product_COMPARATOR = object : DiffUtil.ItemCallback<Product>() {
             override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean =
                 oldItem.id == newItem.id

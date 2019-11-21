@@ -12,7 +12,7 @@ import com.endumedia.herokick.vo.Product
  */
 @Database(
     entities = [Product::class],
-    version = 6,
+    version = 12,
     exportSchema = false)
 abstract class ProductsDb : RoomDatabase() {
 

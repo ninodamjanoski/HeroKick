@@ -8,6 +8,16 @@
     <string name="latest">Latest</string>
     <string name="byName">By name</string>
     <string name="product_listing_filter">Filter</string>
+    <string name="name">Name</string>
+    <string name="details">Details</string>
+    <string name="caloriesLabel">Calories:</string>
+    <string name="brandNameLabel">Brand name:</string>
+    <string name="servingSizeLabel">Serving size:</string>
+    <string name="servingsPerContainerLabel">Servings:</string>
+    <string name="fatCaloriesLabel">Fat calories:</string>
+    <string name="proteinLabel">Protein:</string>
+    <string name="fatLabel">Fat:</string>
+    <string name="sugarsLabel">Sugars:</string>
 
 
     <string-array name="sort_spinner_values">

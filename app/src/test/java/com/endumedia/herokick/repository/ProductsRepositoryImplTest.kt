@@ -12,6 +12,7 @@ import com.endumedia.herokick.db.ProductsDao
 import com.endumedia.herokick.db.ProductsDb
 import com.endumedia.herokick.utils.MockedSharedPrefs
 import com.endumedia.herokick.vo.Product
+import com.endumedia.notes.repository.utils.mock
 import junit.framework.Assert
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
@@ -46,10 +47,12 @@ class ProductsRepositoryImplTest {
     private val FAILED_TO_CONNECT_MESSAGE = "Failed to connect to /192.168.0.138:8000"
     private val fakeDatasource = getProductsDataSourceFromDb()
 
+    private val query = ""
+    
     @Before
     fun init() {
         Mockito.`when`(db.productsDao()).thenReturn(dao)
-        Mockito.doReturn(fakeDatasource).`when`(dao).getItems(sortType)
+        Mockito.doReturn(fakeDatasource).`when`(dao).getItems(query, sortType)
         Mockito.`when`(dao.deleteItems()).then {
             itemsFactory.list.clear()
         }
@@ -73,7 +76,7 @@ class ProductsRepositoryImplTest {
      */
     @Test
     fun fetchEmptyList() {
-        val listing = repository.getItems(sortType)
+        val listing = repository.getItems(query, sortType)
         val pagedList = getPagedList(listing)
         MatcherAssert.assertThat(pagedList.size, CoreMatchers.`is`(0))
     }
@@ -93,8 +96,8 @@ class ProductsRepositoryImplTest {
     fun loadPage() {
         (0..10).map { itemsFactory.createProduct() }
         itemsFactory.list.forEach(fakeApi::addProduct)
-        val listing = repository.getItems(sortType)
-        // trigger loading of the whole list
+        val listing = repository.getItems(query, sortType)
+// trigger loading of the whole list
         val pagedList = getPagedList(listing)
         pagedList.loadAllData()
         MatcherAssert.assertThat(pagedList, CoreMatchers.`is`(itemsFactory.list))
@@ -107,8 +110,8 @@ class ProductsRepositoryImplTest {
     fun oneItemFromDb() {
         val product = itemsFactory.createProduct()
         fakeApi.addProduct(product)
-        val listing = repository.getItems(sortType)
-        MatcherAssert.assertThat(getPagedList(listing), CoreMatchers.`is`(listOf(product)))
+        val listing = repository.getItems(query, sortType)
+MatcherAssert.assertThat(getPagedList(listing), CoreMatchers.`is`(listOf(product)))
     }
 
     /**
@@ -127,9 +130,8 @@ class ProductsRepositoryImplTest {
         // network endpoint
         isDbEmpty = true
 
-        val listing = repository.getItems(sortType)
-
-        val networkObserver = Mockito.mock(Observer::class.java) as Observer<NetworkState>
+        val listing = repository.getItems(query, sortType)
+val networkObserver = Mockito.mock(Observer::class.java) as Observer<NetworkState>
         listing.networkState.observeForever(networkObserver)
 
         val pagedList = getPagedList(listing)
@@ -150,9 +152,8 @@ class ProductsRepositoryImplTest {
 
         itemsFactory.createProduct()
 
-        val listing = repository.getItems(sortType)
-
-        val pagedList = getPagedList(listing)
+        val listing = repository.getItems(query, sortType)
+val pagedList = getPagedList(listing)
         MatcherAssert.assertThat(pagedList, CoreMatchers.`is`(itemsFactory.list))
 
         val networkObserver = Mockito.mock(Observer::class.java) as Observer<NetworkState>
@@ -181,7 +182,7 @@ class ProductsRepositoryImplTest {
     private fun failedToLoadFromNetwork() {
         fakeApi.failureMsg = FAILED_TO_CONNECT_MESSAGE
         isDbEmpty = true
-        val items = repository.getItems(sortType)
+        val items = repository.getItems(query, sortType)
         // trigger load
         val listing = getPagedList(items)
         listing.loadAllData()
@@ -202,8 +203,8 @@ class ProductsRepositoryImplTest {
         fakeApi.failureMsg = FAILED_TO_CONNECT_MESSAGE
         isDbEmpty = true
 
-        val listing = repository.getItems(sortType)
-        val pagedList = getPagedList(listing)
+        val listing = repository.getItems(query, sortType)
+val pagedList = getPagedList(listing)
         pagedList.loadAllData()
         Assert.assertTrue(pagedList.loadedCount == 0)
         MatcherAssert.assertThat(getNetworkState(listing),
@@ -297,5 +298,19 @@ class ProductsRepositoryImplTest {
                 }
             }
         }
+    }
+
+    //------------------------ Get By Id ------------------------------//
+
+    private val itemObserver: Observer<Product> = mock()
+    @Test
+    fun getItemById() {
+        fakeApi.addProduct(itemsFactory.createProduct())
+
+        val listing = repository.getItemById(itemsFactory.list.last().id)
+        listing.observeForever(itemObserver)
+
+        Mockito.verify(itemObserver)
+            .onChanged(itemsFactory.list.last())
     }
 }

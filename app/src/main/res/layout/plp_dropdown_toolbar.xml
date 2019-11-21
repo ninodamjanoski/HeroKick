@@ -6,26 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/spinner_product_listing_no_arrow">
 
-
-    <LinearLayout
-        android:id="@+id/filter"
-        android:layout_width="140.0dip"
-        android:layout_height="match_parent"
-        android:layout_weight="1.0"
-        android:background="@drawable/spinner_product_listing_no_arrow"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toStartOf="@+id/spinner_sort"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/product_listing_filter"
-            android:textSize="@dimen/text_16" />
-    </LinearLayout>
-
     <Spinner
         android:id="@+id/spinner_sort"
         android:layout_width="140.0dip"

@@ -13,6 +13,15 @@ import java.io.IOException
  * Created by Nino on 02.10.19
  */
 class FakeProductsApi: ProductsApi {
+    override fun getById(id: String): Call<Product> {
+        failureMsg?.let {
+            return Calls.failure(IOException(it))
+        }
+
+        val nextLink = "<https://www.datakick.org/api/items?page=>; rel=\"next\""
+        val response = Response.success(model.last(), Headers.of("link", nextLink))
+        return Calls.response(response)
+    }
 
     private val model = mutableListOf<Product>()
     var failureMsg: String? = null

@@ -1,4 +1,4 @@
-package com.endumedia.herokick.ui
+package com.endumedia.herokick.ui.productslist
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -8,18 +8,15 @@ import com.endumedia.herokick.repository.SortType
 import javax.inject.Inject
 
 
-/**
- * Created by Nino on 01.10.19
- */
 class ProductsViewModel @Inject
 constructor(repository: ProductsRepository) : ViewModel() {
 
-    private val sortType = MutableLiveData<SortType>().apply {
-        value = SortType.LATEST
+    private val queryData = MutableLiveData<Pair<String, SortType>>().apply {
+        value = Pair("", SortType.LATEST)
     }
 
-    private val listing = Transformations.map(sortType) { sorting ->
-        repository.getItems(sorting)
+    private val listing = Transformations.map(queryData) { sorting ->
+        repository.getItems(sorting.first, sorting.second)
     }
 
     val products = Transformations.switchMap(listing) { it.pagedList }
@@ -36,10 +33,8 @@ constructor(repository: ProductsRepository) : ViewModel() {
         listing.value?.retry?.invoke()
     }
 
-    fun setSorting(idxSorting: Int) {
-        val sorting = SortType.values()[idxSorting]
-        if (sortType.value != sorting) {
-            sortType.value = sorting
-        }
+    fun submitDataRequest(query: String, idxSorting: Int) {
+        val sortType = SortType.values()[idxSorting]
+        queryData.value = Pair(query, sortType)
     }
 }

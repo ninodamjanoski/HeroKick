@@ -1,7 +1,6 @@
 package com.endumedia.herokick.api
 
 import com.endumedia.herokick.vo.Product
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 
@@ -15,8 +14,11 @@ class ItemsFactory {
 
     fun createProduct() : Product {
         val id = counter.incrementAndGet()
-        val moodIdx = (0..2).random()
-        val product = Product("$id", "brand $id", "name $id","$id g")
+        val product = Product("$id", "brand $id",
+            "name $id","$id g",
+            "name $id","$id g",
+            "name $id","$id g",
+            "name $id","$id g", "name $id")
         list.add(product)
         return product
     }

@@ -14,19 +14,19 @@ abstract class ProductsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertItems(list : List<Product>)
 
-    fun getItems(sortType: SortType): DataSource.Factory<Int, Product> {
+    fun getItems(query: String, sortType: SortType): DataSource.Factory<Int, Product> {
         return when (sortType) {
-            SortType.LATEST -> getItems()
-            SortType.NAME -> getItemsByName()
+            SortType.LATEST -> getItems(query)
+            SortType.NAME -> getItemsByName(query)
         }
     }
 
-    @Query("SELECT * FROM Product")
-    abstract fun getItems() : DataSource.Factory<Int, Product>
+    @Query("SELECT * FROM Product WHERE name LIKE '%'|| :keyWord ||'%'")
+    abstract fun getItems(keyWord: String) : DataSource.Factory<Int, Product>
 
 
-    @Query("SELECT * FROM Product ORDER BY name ASC")
-    abstract fun getItemsByName() : DataSource.Factory<Int, Product>
+    @Query("SELECT * FROM Product WHERE name LIKE '%'|| :keyWord ||'%' ORDER BY name ASC")
+    abstract fun getItemsByName(keyWord: String) : DataSource.Factory<Int, Product>
 
     @Query("DELETE FROM Product")
     abstract fun deleteItems()

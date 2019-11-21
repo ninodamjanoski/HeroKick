@@ -50,7 +50,7 @@ dependencies {
     kapt deps.room.compiler
     kapt deps.dagger.android_support_compiler
     kapt deps.dagger.compiler
-
+    implementation group: 'com.google.android.gms', name: 'play-services-base', version: '17.1.0'
     implementation deps.constraint_layout
     implementation deps.support.app_compat
     implementation deps.support.fragment_runtime_ktx

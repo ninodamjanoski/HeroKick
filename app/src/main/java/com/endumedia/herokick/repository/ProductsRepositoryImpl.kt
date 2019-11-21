@@ -3,6 +3,7 @@ package com.endumedia.herokick.repository
 import android.content.SharedPreferences
 import android.text.TextUtils
 import androidx.annotation.MainThread
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.toLiveData
 import com.endumedia.herokick.api.ProductsApi
@@ -35,7 +36,7 @@ constructor(private val productsDao: ProductsDao,
     private fun refreshItems() {
 
         refreshState.value = NetworkState.LOADING
-        productsApi.getItems(1).enqueue(object : Callback<List<Product>> {
+        productsApi.getItems().enqueue(object : Callback<List<Product>> {
             override fun onFailure(call: Call<List<Product>>, t: Throwable) {
                 // retrofit calls this on main thread so safe to call set value
                     refreshState.value = NetworkState.error(t.message)
@@ -47,7 +48,8 @@ constructor(private val productsDao: ProductsDao,
             ) {
                 ioExecutor.execute {
                     sharedPrefs.edit()
-                        .clear()
+                        .remove(NEXT_PAGE)
+                        .apply()
                     productsDao.deleteItems()
                     insertItemsInDb(response)
                     // since we are in bg thread now, post the result.
@@ -57,7 +59,24 @@ constructor(private val productsDao: ProductsDao,
         })
      }
 
-    override fun getItems(sortType: SortType): Listing<Product> {
+    override fun getItemById(id: String): LiveData<Product> {
+        val itemData = MutableLiveData<Product>()
+        productsApi.getById(id).enqueue(object : Callback<Product> {
+            override fun onFailure(call: Call<Product>, t: Throwable) {
+                //Ignore, we still have the item
+            }
+
+            override fun onResponse(call: Call<Product>, response: Response<Product>) {
+                if (response.isSuccessful) {
+                    itemData.postValue(response.body())
+                }
+            }
+        })
+        return itemData
+
+    }
+
+    override fun getItems(query: String, sortType: SortType): Listing<Product> {
 
         // create a boundary callback which will observe when the user reaches to the edges of
         // the list and update the database with extra data.
@@ -68,7 +87,7 @@ constructor(private val productsDao: ProductsDao,
             ioExecutor = ioExecutor)
 
         return Listing(
-            pagedList = productsDao.getItems(sortType)
+            pagedList = productsDao.getItems(query, sortType)
                 .toLiveData(10, boundaryCallback = boundaryCallback),
             networkState = boundaryCallback.networkState,
             refreshState = refreshState,
@@ -79,11 +98,15 @@ constructor(private val productsDao: ProductsDao,
     private fun insertItemsInDb(response: Response<List<Product>>) {
         if (response.body()?.isEmpty() ?: true) return
         val nextPage = getNextPage(response.headers())
+        // If the next page is null, that means we have
+        // reached the end of the list, I set -1 to avoid future network calls
         sharedPrefs.edit()
             .putInt(NEXT_PAGE, nextPage ?: -1)
             .apply()
 
         response.body()?.let {
+            // Because of inconsisstency of the items, some fields somewhere are null,
+            // I`m filtering just items with fields used to show in the list
             val filteredList = it.filter { item -> !TextUtils.isEmpty(item.id) &&
                     (!TextUtils.isEmpty(item.name) ||
                     !TextUtils.isEmpty(item.brandName) ||

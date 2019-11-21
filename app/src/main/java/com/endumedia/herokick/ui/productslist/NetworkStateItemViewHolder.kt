@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.endumedia.herokick.ui
+package com.endumedia.herokick.ui.productslist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -43,9 +43,18 @@ class NetworkStateItemViewHolder(view: View,
         }
     }
     fun bindTo(networkState: NetworkState?) {
-        progressBar.visibility = toVisibility(networkState?.status == Status.RUNNING)
-        retry.visibility = toVisibility(networkState?.status == Status.FAILED)
-        errorMsg.visibility = toVisibility(networkState?.msg != null)
+        progressBar.visibility =
+            toVisibility(
+                networkState?.status == Status.RUNNING
+            )
+        retry.visibility =
+            toVisibility(
+                networkState?.status == Status.FAILED
+            )
+        errorMsg.visibility =
+            toVisibility(
+                networkState?.msg != null
+            )
         errorMsg.text = networkState?.msg
     }
 
@@ -53,7 +62,10 @@ class NetworkStateItemViewHolder(view: View,
         fun create(parent: ViewGroup, retryCallback: () -> Unit): NetworkStateItemViewHolder {
             val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.network_state_item, parent, false)
-            return NetworkStateItemViewHolder(view, retryCallback)
+            return NetworkStateItemViewHolder(
+                view,
+                retryCallback
+            )
         }
 
         fun toVisibility(constraint : Boolean): Int {

@@ -1,6 +1,7 @@
 package com.endumedia.herokick.di
 
-import com.endumedia.herokick.ui.ProductsFragment
+import com.endumedia.herokick.ui.details.DetailsFragment
+import com.endumedia.herokick.ui.productslist.ProductsFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -14,4 +15,7 @@ abstract class FragmentBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeProductsFragment(): ProductsFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeDetailsFragment(): DetailsFragment
 }

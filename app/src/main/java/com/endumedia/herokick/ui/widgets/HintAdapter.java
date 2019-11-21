@@ -31,16 +31,6 @@ public class HintAdapter<T> extends ArrayAdapter<T> {
     private int selectedBottomPosition;
     private int selectedTopPosition;
 
-    public HintAdapter(Context context, int i, List<T> list) {
-        this(context, DEFAULT_LAYOUT_RESOURCE, context.getString(i), list);
-        this.context = context;
-    }
-
-    public HintAdapter(Context context, String str, List<T> list) {
-        this(context, DEFAULT_LAYOUT_RESOURCE, str, list);
-        this.context = context;
-    }
-
     public HintAdapter(Context context, int i, int i2, List<T> list, boolean z) {
         this(context, i, context.getString(i2), list);
         this.context = context;
@@ -141,6 +131,10 @@ public class HintAdapter<T> extends ArrayAdapter<T> {
 
     public void setSelectedBottomPosition(int i) {
         this.selectedBottomPosition = i;
+    }
+
+    public int getSelectedTopPosition() {
+        return selectedTopPosition;
     }
 
     private void setMargin(FrameLayout frameLayout, boolean z) {
